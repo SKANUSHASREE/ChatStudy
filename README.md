@@ -77,32 +77,40 @@ Client-server chat applications are foundational to real-time communication over
 server
 ```
 import socket
-from datetime import datetime
-s = socket.socket()
-s.bind(('localhost', 5000))
-s.listen(5)
-c, addr = s.accept()
-print("Client Address :", addr)
-now = datetime.now()
-c.send(now.strftime("%d/%m/%Y %H:%M:%S").encode())
-ack = c.recv(1024).decode()
-if ack:
-    print(ack)
-c.close()
+host = '127.0.0.1'   
+port = 5000          
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.bind((host, port))
+server_socket.listen(1)
+print("Server is listening on", host, ":", port)
+conn, addr = server_socket.accept()
+print("Connection from:", addr)
+while True:
+    data = conn.recv(1024).decode()
+    if not data:
+        break
+    print("Client:", data)
+    message = input("Server: ")
+    conn.send(message.encode())
+conn.close()
 ```
 client
 ```
 import socket
-s = socket.socket()
-s.connect(('localhost', 5000))
-print(s.getsockname())
-print(s.recv(1024).decode())
-s.send("Acknowledgement received from the client".encode())
-s.close()
+host = '127.0.0.1'   
+port = 5000
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket.connect((host, port))
+while True:
+    message = input("Client: ")
+    client_socket.send(message.encode())
+    data = client_socket.recv(1024).decode()
+    print("Server:", data)
+client_socket.close()
 ```
 ## Output:
 
-<img width="1855" height="358" alt="image" src="https://github.com/user-attachments/assets/5549658b-a3ff-4752-ade7-5138c0f318af" />
+<img width="1858" height="373" alt="image" src="https://github.com/user-attachments/assets/09631b5e-16a4-49fc-8f03-f39ede285ef6" />
 
 ## Result:
 
